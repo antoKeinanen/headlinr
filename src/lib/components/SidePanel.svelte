@@ -30,7 +30,8 @@
 
   const tryFetchFeed = async (url: string) => {
     try {
-      const response = await fetch(url);
+      const response = await fetch("/api/fetch-feed", { mode: "cors", method:"GET", headers: { "x-feed-url": url}});
+
       const xml = await response.text();
       const data = extractFromXml(xml);
 

@@ -3,6 +3,7 @@
   import * as Card from "$lib/components/ui/card";
   import { feedsStorage } from "$lib/data/Feeds";
   import { activeFeedStore } from "$lib/data/SidePanelData";
+  import { XmlParser } from "$lib/parsers/XmlParser";
   import { toHeadlines, type NewsFeed } from "$lib/types/News";
   import { extractFromXml } from "@extractus/feed-extractor";
 
@@ -11,11 +12,10 @@
   const fetchFeed = async () => {
     if (!activeFeed) throw new Error("No feed selected");
 
-    const rawFeed = await fetch(activeFeed.url);
-    const xml = await rawFeed.text();
-    const data = extractFromXml(xml);
+    const parser = new XmlParser();
+    
 
-    return toHeadlines(data);
+    return await parser.parse(activeFeed.url);
   };
 </script>
 

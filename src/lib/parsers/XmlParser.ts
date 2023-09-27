@@ -14,7 +14,7 @@ export class XmlParser extends Parser {
   async parse(url: string) {
     const data = await this.fetch(url);
 
-    const feed = await extractFromXml(data);
+    const feed = extractFromXml(data);
     return toHeadlines(feed);
   }
 }

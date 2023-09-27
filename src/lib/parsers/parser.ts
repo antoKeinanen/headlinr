@@ -8,7 +8,7 @@ export abstract class Parser {
    * @returns The fetched data as a string.
    */
   protected async fetch(url: string) {
-    const rawData = await fetch(url);
+    const rawData = await fetch("/api/fetch-feed", { mode: "cors", method:"GET", headers: { "x-feed-url": url}});
     const data = await rawData.text();
     
     return data;
