@@ -3,7 +3,7 @@
   import * as Sheet from "$lib/components/ui/sheet";
   import type { NewsFeed } from "$lib/types/News";
   import { cn } from "$lib/utils";
-  import { Plus } from "lucide-svelte";
+  import { MoreVertical, Plus, Trash2 } from "lucide-svelte";
   import { Button } from "./ui/button";
   import * as Card from "./ui/card";
   import { Input } from "./ui/input";
@@ -11,6 +11,7 @@
   import Separator from "./ui/separator/separator.svelte";
   import { extractFromXml } from "@extractus/feed-extractor";
   import { feedsStorage } from "$lib/data/Feeds";
+  import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 
   export const kind = "feed";
 
@@ -22,8 +23,10 @@
   const handleInputChange = (event: any) => {
     feedUrl = event.target.value;
     clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {tryFetchFeed(feedUrl)}, 500);
-  }
+    timeoutId = setTimeout(() => {
+      tryFetchFeed(feedUrl);
+    }, 500);
+  };
 
   const tryFetchFeed = async (url: string) => {
     try {
@@ -56,6 +59,13 @@
       return feeds;
     });
   };
+
+  const deleteFeed = (index: number) => {
+    feedsStorage.update((feeds) => {
+      feeds.splice(index, 1);
+      return feeds;
+    });
+  };
 </script>
 
 {#if kind == "feed"}
@@ -78,7 +88,7 @@
         <div class="grid gap-4 py-4">
           <div>
             <Label for="link" class="mb-2">Link to feed</Label>
-            <Input id="link" class="col-span-3" on:change={handleInputChange}/>
+            <Input id="link" class="col-span-3" on:change={handleInputChange} />
           </div>
           <Separator class="mt-4" />
           <div>
@@ -98,17 +108,26 @@
       </Sheet.Content>
     </Sheet.Root>
     {#each $feedsStorage as feed, i}
-      <button class="text-left" on:click={() => setActiveFeed(i)}>
+      <button class="relative text-left" on:click={() => setActiveFeed(i)}>
         <Card.Root class={cn({ "border-indigo-900 bg-indigo-600": i == $activeFeedStore })}>
           <Card.Header>
             <Card.Title>
               <p>{feed.title}</p>
               <p class="text-base font-normal text-secondary">{feed.site}</p>
+              <div class="absolute right-2 top-2">
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger><Button variant="ghost" size="sm"><MoreVertical /></Button></DropdownMenu.Trigger>
+                  <DropdownMenu.Content class="max-w-[10rem]">
+                    <DropdownMenu.Group>
+                      <DropdownMenu.Label>{feed.title}</DropdownMenu.Label>
+                      <DropdownMenu.Separator />
+                      <DropdownMenu.Item on:click={() => deleteFeed(i)}><Trash2 class="mr-2" /> Delete</DropdownMenu.Item>
+                    </DropdownMenu.Group>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Root>
+              </div>
             </Card.Title>
           </Card.Header>
-          <!-- <Card.Content>
-            <p>{feed.url}</p>
-          </Card.Content> -->
         </Card.Root>
       </button>
     {/each}
